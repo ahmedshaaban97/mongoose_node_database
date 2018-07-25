@@ -1,4 +1,8 @@
 const mongoose = require('mongoose');
+const express = require('express');
+const User = require('./models/User');
+const app  = express();
+const port = 4444 || process.env.PORT;
 
 mongoose.connect('mongodb://localhost:27017/mongoose');
 mongoose.connection
@@ -6,6 +10,34 @@ mongoose.connection
     .on('error',(err)=>{
     console.log('connection error')
 });
+
+//here we insert our data
+
+// const new_user = new User({
+//     first_name: 'Ahmed',
+//     last_name: 'Shaaban',
+//     is_active: 1
+//
+// });
+//
+// new_user.save(function (err , dataSaved) {
+//     if (err) return err;
+//     console.log(dataSaved);
+// });
+
+
+
+
+app.get('/',(req,res)=>{
+    res.send('root');
+});
+
+
+
+app.listen(port,()=>{
+    console.log(`listening to port ${port}`);
+});
+
 
 
 
