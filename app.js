@@ -2,7 +2,9 @@ const mongoose = require('mongoose');
 const express = require('express');
 const User = require('./models/User');
 const app  = express();
+const bodyParser = require('body-parser');
 const port = 4444 || process.env.PORT;
+mongoose.promise = global.promise;
 
 mongoose.connect('mongodb://localhost:27017/mongoose');
 mongoose.connection
@@ -10,6 +12,11 @@ mongoose.connection
     .on('error',(err)=>{
     console.log('connection error')
 });
+
+
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended : false}));
 
 //here we insert our data
 
@@ -27,7 +34,83 @@ mongoose.connection
 
 
 
+app.post('/users',(req,res)=>{
+    const new_user = new User({
+    first_name: req.body.first_name,
+    last_name: req.body.last_name,
+    is_active: req.body.is_active
 
+});
+new_user.save().then(savedUser=>{
+    res.send('user saved successfully by me');
+}).catch(err=>{
+    res.status(404).send('user not saved');
+});
+});
+
+//to read all data from data base
+
+app.get('/users',(req,res)=>{
+    User.find({}).then(users=>{
+       res.send(users);
+       console.log('users have been seen');
+    });
+
+});
+
+
+// app.patch('/users/:id',(req , res)=>{
+//
+//     const id = req.params.id;
+//     const first_name = req.body.first_name;
+//     User.findByIdAndUpdate({_id : id}, {$set : {first_name : first_name}} , {new : true})
+//         .then(updateUser=>{
+//             res.send('user has been updated');
+//             console.log(`the user by name ${first_name} has benn updated`)
+//         });
+//
+//
+// });
+
+
+
+app.put('/users/:id',(req , res)=>{
+
+    const id = req.params.id;
+    User.findOne({_id : req.params.id}).then(user=>{
+            user.first_name = req.body.first_name;
+            user.last_name = req.body.last_name;
+
+            user.save().then(savedUser=>{
+                res.send('this is the put user');
+            });
+    });
+
+});
+
+
+app.delete('/users/:id',(req , res)=>{
+
+
+    User.remove({_id : req.params.id}).then(deletedUser=>{
+        res.send(`${deletedUser.first} has been removed again`);
+    })
+
+
+
+
+});
+
+
+
+
+
+
+
+
+
+
+//
 app.get('/',(req,res)=>{
     res.send('root');
 });
